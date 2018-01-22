@@ -5,19 +5,17 @@ console.log('Welcome to the GitHub Avatar Downloader!');
 
 function getRepoContributors(repoOwner, repoName, cb) {
 
-  // request.get('https://sytantris.github.io/http-examples/future.jpg')               // Note 1
-  //      .on('error', function (err) {                                   // Note 2
-  //        throw err;
-  //      })
-  //      .on('response', function (response) {                           // Note 3
-  //        console.log('Response Status Code: ', response.statusCode);
-  //        console.log(response.headers['content-type']);
-  //        console.log("Image download complete.");
+  var options = {
+    url: "https://api.github.com/repos/" + repoOwner + "/" + repoName + "/contributors",
+    headers: {
+      'User-Agent': 'request',
 
-  //      })
-  //      .pipe(fs.createWriteStream('./future.jpg'));
+    }
+  };
 
-  // ...
+  request(options, function(err, res, body) {
+    cb(err, body);
+  });
 }
 
 
