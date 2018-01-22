@@ -1,0 +1,22 @@
+{
+  "name": "github-avatar",
+  "version": "1.0.0",
+  "description": "Lighthouse Labs avatar download project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Zushisan/GitHub-Avatar-Downloader.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Zushisan/GitHub-Avatar-Downloader/issues"
+  },
+  "homepage": "https://github.com/Zushisan/GitHub-Avatar-Downloader#readme",
+  "dependencies": {
+    "request": "^2.83.0"
+  }
+}
