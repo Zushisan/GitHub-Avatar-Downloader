@@ -1,6 +1,8 @@
-var request = require('request');
-var fs = require('fs');
-var dotenv = require('dotenv');
+require('dotenv').config();
+
+const request = require('request');
+const fs = require('fs');
+const dotenv = require('dotenv');
 
 var arg = process.argv.splice(2);
 
@@ -35,13 +37,14 @@ else {
       url: "https://api.github.com/repos/" + repoOwner + "/" + repoName + "/contributors",
       headers: {
         'User-Agent': 'request',
-        'Authorization': dotenv.GITHUB_TOKEN
+        'Authorization': process.env.GITHUB_TOKEN
       }
     };
 
     request(options, function(err, res, body) {
-      var currentCode = res.statusCode.toString(); //tostring split
-      if(currentCode[0] === "4"){
+      var currentCode = res.statusCode.toString();
+      if(currentCode[0] !== "2"){  // Handle error type
+
         var bodyObject = JSON.parse(body);
         console.log("Status code: " + res.statusCode);
         console.log("Error: " + bodyObject.message);
@@ -55,23 +58,31 @@ else {
   // This function find the repo and feed our download image function the information on what to download.
   getRepoContributors(arg[0], arg[1], function(err, result) {
 
-    // If the folder doesnt exist, throw and error.
-    fs.stat("avatars", function(err, stats) {
-      if(err){
-        console.log("Directory avatars does not exist. Request terminated.")
-        return;
-      }
+    if(process.env.GITHUB_TOKEN){
+      // If the folder doesnt exist, throw and error.
+      fs.stat("avatars", function(err, stats) {
+        if(err){
+          console.log("Directory avatars does not exist. Request terminated.")
+          return;
+        }
 
-      var resultObject = JSON.parse(result);
+        var resultObject = JSON.parse(result);
 
-      // Loop throught the parsed object to find the url we want
-      for(key in resultObject){
-        var avatarUrl = resultObject[key].avatar_url;
-        downloadImageByURL(avatarUrl, "./avatars/" + resultObject[key].login + ".jpg")
-      }
-
-    });
+        // Loop throught the parsed object to find the url we want
+        for(key in resultObject){
+          var avatarUrl = resultObject[key].avatar_url;
+          downloadImageByURL(avatarUrl, "./avatars/" + resultObject[key].login + ".jpg")
+        }
+      });
+    }
+    else{
+      console.log("Could not find ENV file.");
+      return;
+    }
   });
 }
 
 
+
+// the .env file is missing information
+// the .env file contains incorrect credentials
