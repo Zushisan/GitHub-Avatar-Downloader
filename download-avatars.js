@@ -82,7 +82,3 @@ else {
   });
 }
 
-
-
-// the .env file is missing information
-// the .env file contains incorrect credentials
