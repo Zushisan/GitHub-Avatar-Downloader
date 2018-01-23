@@ -41,9 +41,10 @@ else {
       }
     };
 
+    // We handle some error in here direclty
     request(options, function(err, res, body) {
       var currentCode = res.statusCode.toString();
-      if(currentCode[0] !== "2"){  // Handle error type
+      if(currentCode[0] !== "2" ){  // Handle error type
 
         var bodyObject = JSON.parse(body);
         console.log("Status code: " + res.statusCode);
@@ -69,7 +70,7 @@ else {
         var resultObject = JSON.parse(result);
 
         // Loop throught the parsed object to find the url we want
-        for(key in resultObject){
+        for(var key in resultObject){
           var avatarUrl = resultObject[key].avatar_url;
           downloadImageByURL(avatarUrl, "./avatars/" + resultObject[key].login + ".jpg")
         }

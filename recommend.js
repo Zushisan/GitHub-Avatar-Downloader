@@ -17,7 +17,7 @@ else {
 
   console.log('Welcome to the GitHub Recommended Repos !');
 
-  // function that will download the img at the url and put it in filePath
+  // Function that will get the result from the url request
   function getStarredUrl(url, callback) {
 
     var options = {
@@ -27,65 +27,55 @@ else {
         'Authorization': process.env.GITHUB_TOKEN
       }
     };
-    // console.log(url);
+
     request(options, function(err, res, body) {
-    var currentCode = res.statusCode.toString();
-    if(currentCode[0] !== "2"){  // Handle error type
+      var currentCode = res.statusCode.toString();
+      if(currentCode[0] !== "2"){  // Handle error type
+
+        var bodyObject = JSON.parse(body);
+        console.log("Status code: " + res.statusCode);
+        console.log("Error: " + bodyObject.message);
+        return;
+      }
 
       var bodyObject = JSON.parse(body);
-      console.log("Status code: " + res.statusCode);
-      console.log("Error: " + bodyObject.message);
-      return;
-    }
-
-    var bodyObject = JSON.parse(body);
-    // res.on('data', function (data) {
-    for (key in bodyObject){
-      globalObjectResult = globalObjectResult + bodyObject[key].full_name + " ";
-    }
-    // console.log(globalObjectResult);
-  // });
-    // console.log(typeof globalObjectResult);
-    if(globalCounter === 1){
-      // console.log(globalObjectResult);
-      resultArray = globalObjectResult.split(" ");
-      // console.log(resultArray);
-      var resultObject = {};
-      // console.log(bodyObject);
-      for ( i = 0; i < resultArray.length; i++){
-        if(resultObject[resultArray[i]]){
-          resultObject[resultArray[i]] += 1;
-        }
-        else {
-          resultObject[resultArray[i]] = 1;
-        }
+      // We use that for loop as a buffer
+      for (var key in bodyObject){
+        globalObjectResult = globalObjectResult + bodyObject[key].full_name + " ";
       }
-      var finalObject = {};
-      for(key in resultObject){
-        // console.log(typeof resultObject[key]);
 
-        if(resultObject[key] > 1){
-          finalObject[key] = resultObject[key];
-
-          // console.log(resultObject[key]);
-          // console.log(typeof resultObject[key]);
+      // We use the globalCounter to wait until the for loop as taken all the data
+      if(globalCounter === 1){
+        // We put the data in an array to handle better
+        resultArray = globalObjectResult.split(" ");
+        //
+        var resultObject = {};
+        // We push our result into an object
+        for (var i = 0; i < resultArray.length; i++){
+          if(resultObject[resultArray[i]]){
+            resultObject[resultArray[i]] += 1;
+          }
+          else {
+            resultObject[resultArray[i]] = 1;
+          }
         }
+
+        // We sort our Object !! and we display the result.
+        var keysSorted = Object.keys(resultObject).sort(function(a,b){return resultObject[b]-resultObject[a]})
+
+        console.log("The top 5 most contributors !!");
+        console.log("[ " + resultObject[keysSorted[0]] + " stars ] " + keysSorted[0]);
+        console.log("[ " + resultObject[keysSorted[1]] + " stars ] " + keysSorted[1]);
+        console.log("[ " + resultObject[keysSorted[2]] + " stars ] " + keysSorted[2]);
+        console.log("[ " + resultObject[keysSorted[3]] + " stars ] " + keysSorted[3]);
+        console.log("[ " + resultObject[keysSorted[4]] + " stars ] " + keysSorted[4]);
       }
-      var keysSorted = Object.keys(finalObject).sort(function(a,b){return finalObject[b]-finalObject[a]})
-
-      console.log("The top 5 most contributors !!");
-      console.log("[ " + finalObject[keysSorted[0]] + " stars ] " + keysSorted[0]);
-      console.log("[ " + finalObject[keysSorted[1]] + " stars ] " + keysSorted[1]);
-      console.log("[ " + finalObject[keysSorted[2]] + " stars ] " + keysSorted[2]);
-      console.log("[ " + finalObject[keysSorted[3]] + " stars ] " + keysSorted[3]);
-      console.log("[ " + finalObject[keysSorted[4]] + " stars ] " + keysSorted[4]);
-    }
-    globalCounter--;
-  });
-}
+      globalCounter--; // Global counter that wait the buffer
+    });
+  }
 
 
-
+  // First step, taht function gets the repo contributor.
   function getRepoContributors(repoOwner, repoName, cb) {
 
     var options = {
@@ -105,14 +95,13 @@ else {
         console.log("Error: " + bodyObject.message);
         return;
       }
-      // var bodyObject = JSON.parse(body);
-      // console.log(body);
+
       cb(err, body);
     });
   }
 
 
-  // This function find the repo and feed our download image function the information on what to download.
+  // We get the repoContributors we want then feed the starredUrl to our function that will return our result
   getRepoContributors(arg[0], arg[1], function(err, result) {
 
     if(process.env.GITHUB_TOKEN){
@@ -120,7 +109,7 @@ else {
        var resultObject = JSON.parse(result);
 
         // Loop throught the parsed object to find the url we want
-      for(key in resultObject){
+      for(var key in resultObject){
         var starredUrl = resultObject[key].starred_url;
         starredUrl = starredUrl.slice(0, -15);
         // console.log(starredUrl);
